@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PSU Shop System — OOP Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --navy:#1a2340;
+  --navy2:#243056;
+  --green:#00875a;
+  --green2:#00a86e;
+  --green-light:#e6f7f1;
+  --amber:#d97706;
+  --amber-light:#fef3c7;
+  --red:#dc2626;
+  --red-light:#fee2e2;
+  --blue:#1d4ed8;
+  --blue-light:#eff6ff;
+  --purple:#7c3aed;
+  --purple-light:#f5f3ff;
+  --bg:#f4f5f7;
+  --white:#ffffff;
+  --text:#1e2329;
+  --text2:#4b5563;
+  --text3:#9ca3af;
+  --border:#e5e7eb;
+  --border2:#d1d5db;
+  --sidebar:260px;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'IBM Plex Sans Thai',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.7;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:52px;background:var(--navy);
+  display:flex;align-items:center;gap:0;
+  box-shadow:0 1px 3px rgba(0,0,0,0.3);
+}
+.topbar-brand{
+  width:var(--sidebar);flex-shrink:0;
+  display:flex;align-items:center;gap:10px;
+  padding:0 1.25rem;
+  border-right:1px solid rgba(255,255,255,0.1);
+}
+.brand-icon{
+  width:28px;height:28px;border-radius:6px;
+  background:var(--green);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:#fff;
+}
+.brand-name{
+  font-size:14px;font-weight:600;color:#fff;
+  font-family:'IBM Plex Mono',monospace;
+}
+.brand-name span{color:rgba(255,255,255,0.4);font-weight:400;}
+.topbar-tabs{display:flex;align-items:center;height:100%;flex:1;overflow-x:auto;}
+.topbar-tab{
+  display:flex;align-items:center;gap:8px;
+  padding:0 1rem;height:100%;
+  font-family:'IBM Plex Mono',monospace;font-size:12px;color:rgba(255,255,255,0.5);
+  cursor:pointer;border-right:1px solid rgba(255,255,255,0.06);
+  white-space:nowrap;transition:background 0.15s,color 0.15s;
+  text-decoration:none;
+}
+.topbar-tab:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.8);}
+.topbar-tab.active{background:var(--bg);color:var(--text);border-bottom:none;}
+.tab-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ── LAYOUT ── */
+.layout{display:flex;margin-top:52px;min-height:calc(100vh - 52px);}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar);flex-shrink:0;
+  position:fixed;top:52px;left:0;bottom:0;
+  background:var(--white);border-right:1px solid var(--border);
+  overflow-y:auto;padding:1rem 0;
+}
+.sidebar-section{margin-bottom:0.25rem;}
+.sidebar-heading{
+  padding:0.4rem 1.25rem;
+  font-size:10px;font-weight:600;color:var(--text3);
+  letter-spacing:0.1em;text-transform:uppercase;
+}
+.sidebar-link{
+  display:flex;align-items:center;gap:10px;
+  padding:0.45rem 1.25rem;
+  font-size:13px;color:var(--text2);
+  text-decoration:none;cursor:pointer;
+  transition:background 0.12s,color 0.12s;
+  border-left:3px solid transparent;
+}
+.sidebar-link:hover{background:#f9fafb;color:var(--text);}
+.sidebar-link.active{
+  background:var(--green-light);color:var(--green);
+  border-left-color:var(--green);font-weight:500;
+}
+.sidebar-icon{
+  width:18px;height:18px;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;
+  flex-shrink:0;
+}
+.ic-g{background:#d1fae5;color:#065f46;}
+.ic-b{background:#dbeafe;color:#1e40af;}
+.ic-p{background:#ede9fe;color:#5b21b6;}
+.ic-o{background:#fef3c7;color:#92400e;}
+.ic-r{background:#fee2e2;color:#991b1b;}
+.ic-n{background:#f3f4f6;color:#374151;}
+
+.sidebar-badge{
+  margin-left:auto;background:#e5e7eb;color:#6b7280;
+  font-size:10px;padding:1px 7px;border-radius:10px;
+  font-family:'IBM Plex Mono',monospace;
+}
+
+/* ── MAIN ── */
+.main{
+  margin-left:var(--sidebar);flex:1;min-width:0;
+  padding:2rem 2.5rem 4rem;
+}
+
+/* ── BREADCRUMB ── */
+.breadcrumb{
+  display:flex;align-items:center;gap:6px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;color:var(--text3);margin-bottom:2rem;
+}
+.breadcrumb a{color:var(--text3);text-decoration:none;}
+.breadcrumb a:hover{color:var(--green);}
+.breadcrumb .sep{color:var(--border2);}
+
+/* ── PAGE TITLE ── */
+.page-header{margin-bottom:2rem;}
+.page-title{
+  font-size:1.8rem;font-weight:600;
+  color:var(--navy);line-height:1.2;margin-bottom:0.5rem;
+}
+.page-desc{color:var(--text2);font-size:15px;max-width:640px;}
+
+/* ── ALERT BOXES ── */
+.alert{
+  display:flex;gap:12px;padding:14px 16px;
+  border-radius:8px;margin-bottom:1.5rem;
+  border:1px solid transparent;font-size:14px;
+}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.alert-green{background:var(--green-light);border-color:#a7f3d0;color:#065f46;}
+.alert-blue{background:var(--blue-light);border-color:#bfdbfe;color:#1e3a8a;}
+.alert-amber{background:var(--amber-light);border-color:#fde68a;color:#78350f;}
+
+/* ── CARDS ── */
+.card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:10px;margin-bottom:1.5rem;overflow:hidden;
+}
+.card-header{
+  padding:1rem 1.25rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:#fafafa;
+}
+.card-title{
+  font-size:14px;font-weight:600;color:var(--navy);
+  display:flex;align-items:center;gap:8px;
+}
+.card-body{padding:1.25rem;}
+
+/* ── GRID ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+
+/* ── STAT CARDS ── */
+.stat-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:10px;padding:1.2rem 1.5rem;
+}
+.stat-label2{font-size:12px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;}
+.stat-val{font-size:2rem;font-weight:600;color:var(--navy);line-height:1;margin-bottom:4px;}
+.stat-sub{font-size:12px;color:var(--text3);}
+.stat-bar{height:3px;border-radius:2px;margin-top:12px;background:var(--border);}
+.stat-fill{height:100%;border-radius:2px;}
+
+/* ── CONCEPT LIST ── */
+.concept-list{display:flex;flex-direction:column;gap:1px;background:var(--border);}
+.concept-item{
+  background:var(--white);padding:1.25rem 1.5rem;
+  display:flex;gap:1.25rem;align-items:flex-start;
+  transition:background 0.15s;
+}
+.concept-item:hover{background:#fafafa;}
+.concept-num{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;color:var(--text3);
+  min-width:24px;padding-top:2px;
+}
+.concept-content{}
+.concept-name{font-weight:600;font-size:15px;color:var(--navy);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.concept-desc{font-size:13px;color:var(--text2);line-height:1.7;}
+
+/* ── BADGES ── */
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;padding:2px 9px;border-radius:12px;
+  font-family:'IBM Plex Mono',monospace;font-weight:600;
+}
+.badge-green{background:#d1fae5;color:#065f46;}
+.badge-blue{background:#dbeafe;color:#1e40af;}
+.badge-purple{background:#ede9fe;color:#5b21b6;}
+.badge-amber{background:#fef3c7;color:#92400e;}
+.badge-red{background:#fee2e2;color:#991b1b;}
+.badge-gray{background:#f3f4f6;color:#374151;}
+
+/* ── CODE VIEWER ── */
+.code-viewer{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1.5rem;}
+.code-tabs{display:flex;background:#f8f9fa;border-bottom:1px solid var(--border);overflow-x:auto;}
+.code-tab{
+  padding:8px 16px;font-family:'IBM Plex Mono',monospace;font-size:12px;
+  color:var(--text3);cursor:pointer;white-space:nowrap;
+  border-bottom:2px solid transparent;transition:all 0.15s;
+}
+.code-tab:hover{color:var(--text2);}
+.code-tab.active{color:var(--green);border-bottom-color:var(--green);background:var(--white);}
+.code-panels{}
+.code-panel{display:none;position:relative;}
+.code-panel.active{display:block;}
+.code-meta{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 16px;background:#fafafa;border-bottom:1px solid var(--border);
+  font-size:12px;color:var(--text3);font-family:'IBM Plex Mono',monospace;
+}
+.copy-btn{
+  padding:3px 10px;border:1px solid var(--border);border-radius:4px;
+  background:var(--white);color:var(--text2);font-size:11px;
+  cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all 0.15s;
+}
+.copy-btn:hover{background:var(--green);color:#fff;border-color:var(--green);}
+pre{
+  padding:1.25rem 1.5rem;overflow-x:auto;
+  font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.9;
+  color:#1e2329;margin:0;
+  background:var(--white);
+}
+.kw{color:#0066cc;font-weight:600;}
+.cls{color:#1a7a4a;font-weight:600;}
+.str{color:#b85c00;}
+.cmt{color:#8b8d8f;font-style:italic;}
+.num{color:#0550ae;}
+.fn{color:#7c3aed;}
+.ann{color:#d97706;}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:14px;}
+th{
+  text-align:left;padding:10px 14px;
+  background:#f8f9fa;font-size:12px;font-weight:600;color:var(--text3);
+  letter-spacing:0.04em;text-transform:uppercase;
+  border-bottom:1px solid var(--border);
+}
+td{
+  padding:11px 14px;border-bottom:1px solid var(--border);
+  color:var(--text2);vertical-align:top;
+}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafafa;}
+td code{
+  font-family:'IBM Plex Mono',monospace;font-size:12px;
+  background:#f3f4f6;padding:1px 6px;border-radius:4px;
+  color:var(--navy);
+}
+
+/* ── UML ── */
+.uml-wrap{padding:1.5rem;display:flex;flex-direction:column;align-items:center;gap:0;}
+.uml-box{
+  border:1.5px solid var(--border2);border-radius:8px;
+  background:var(--white);font-family:'IBM Plex Mono',monospace;
+  font-size:12px;min-width:220px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.06);
+}
+.uml-head{
+  padding:8px 14px;border-bottom:1.5px solid var(--border2);
+  text-align:center;font-weight:600;font-size:13px;
+}
+.uml-head.abstract{background:#fef3c7;color:#92400e;}
+.uml-head.concrete{background:#d1fae5;color:#065f46;}
+.uml-head.other{background:#dbeafe;color:#1e40af;}
+.uml-stereotype{font-size:10px;font-weight:400;display:block;margin-bottom:2px;}
+.uml-section{padding:8px 14px;border-bottom:1px solid var(--border);}
+.uml-section:last-child{border-bottom:none;}
+.uml-field{color:#4b5563;padding:1px 0;}
+.uml-field .vis{color:#dc2626;margin-right:4px;}
+.uml-method{color:#1d4ed8;padding:1px 0;}
+.uml-method.abstract-m{color:#d97706;font-style:italic;}
+.uml-method.override-m{color:#065f46;}
+.arrow-area{display:flex;flex-direction:column;align-items:center;padding:6px 0;}
+.arr-line{width:2px;height:32px;background:var(--border2);}
+.arr-tip{font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;}
+.arr-label{font-size:11px;color:var(--green);font-family:'IBM Plex Mono',monospace;margin:2px 0;}
+.uml-row{display:flex;gap:2rem;justify-content:center;}
+.uml-connector{display:flex;flex-direction:column;align-items:center;}
+
+/* ── TEST OUTPUT ── */
+.terminal{
+  background:#1a2340;border-radius:8px;overflow:hidden;
+  font-family:'IBM Plex Mono',monospace;font-size:13px;
+}
+.terminal-bar{
+  display:flex;align-items:center;gap:6px;padding:10px 14px;
+  background:#243056;border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.t-dot{width:10px;height:10px;border-radius:50%;}
+.t-title{font-size:12px;color:rgba(255,255,255,0.4);margin-left:6px;}
+.terminal-body{padding:1.2rem 1.5rem;color:#e2e8f0;line-height:2;}
+.t-cmt{color:#4b5563;}
+.t-uni{color:#60d9a8;}
+.t-sta{color:#7b9ff7;}
+.t-sum{color:#fbbf24;}
+.t-arrow{color:#f97316;}
+
+/* ── PAGES ── */
+.page{display:none;}
+.page.active{display:block;}
+
+/* ── FOOTER ── */
+.footer-bar{
+  margin-top:3rem;padding-top:1.5rem;
+  border-top:1px solid var(--border);
+  font-size:12px;color:var(--text3);font-family:'IBM Plex Mono',monospace;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:gap;
+}
+
+@media(max-width:900px){
+  :root{--sidebar:0px;}
+  .sidebar{display:none;}
+  .main{margin-left:0;padding:1.25rem;}
+  .grid2,.grid3,.grid4{grid-template-columns:1fr;}
+  .topbar-brand{width:auto;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-icon">P</div>
+    <div class="brand-name">PSU<span>.shop</span></div>
+  </div>
+  <div class="topbar-tabs">
+    <a class="topbar-tab active" onclick="showPage('overview',this)">
+      <div class="tab-dot" style="background:#4ade80;"></div>Overview
+    </a>
+    <a class="topbar-tab" onclick="showPage('concepts',this)">
+      <div class="tab-dot" style="background:#60a5fa;"></div>OOP Concepts
+    </a>
+    <a class="topbar-tab" onclick="showPage('code',this)">
+      <div class="tab-dot" style="background:#c084fc;"></div>Source Code
+    </a>
+    <a class="topbar-tab" onclick="showPage('diagram',this)">
+      <div class="tab-dot" style="background:#fb923c;"></div>Class Diagram
+    </a>
+    <a class="topbar-tab" onclick="showPage('output',this)">
+      <div class="tab-dot" style="background:#f87171;"></div>Program Output
+    </a>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-heading">เมนูหลัก</div>
+    <a class="sidebar-link active" onclick="showPage('overview',null,this)">
+      <div class="sidebar-icon ic-g">⌂</div>Overview
+    </a>
+    <a class="sidebar-link" onclick="showPage('concepts',null,this)">
+      <div class="sidebar-icon ic-b">⬡</div>OOP Concepts
+    </a>
+    <a class="sidebar-link" onclick="showPage('code',null,this)">
+      <div class="sidebar-icon ic-p">&lt;/&gt;</div>Source Code
+      <span class="sidebar-badge">5</span>
+    </a>
+    <a class="sidebar-link" onclick="showPage('diagram',null,this)">
+      <div class="sidebar-icon ic-o">⊞</div>Class Diagram
+    </a>
+    <a class="sidebar-link" onclick="showPage('output',null,this)">
+      <div class="sidebar-icon ic-r">▶</div>Program Output
+    </a>
+  </div>
+
+  <div class="sidebar-section" style="margin-top:0.5rem;">
+    <div class="sidebar-heading">Source Files</div>
+    <a class="sidebar-link" onclick="showPage('code',null,this);switchCode('product')">
+      <div class="sidebar-icon ic-o">A</div>Product.java
+      <span class="sidebar-badge">abs</span>
+    </a>
+    <a class="sidebar-link" onclick="showPage('code',null,this);switchCode('uniform')">
+      <div class="sidebar-icon ic-g">U</div>Uniform.java
+    </a>
+    <a class="sidebar-link" onclick="showPage('code',null,this);switchCode('stationery')">
+      <div class="sidebar-icon ic-g">S</div>Stationery.java
+    </a>
+    <a class="sidebar-link" onclick="showPage('code',null,this);switchCode('student')">
+      <div class="sidebar-icon ic-b">SC</div>StudentCustomer.java
+    </a>
+    <a class="sidebar-link" onclick="showPage('code',null,this);switchCode('main')">
+      <div class="sidebar-icon ic-r">M</div>TestMain.java
+    </a>
+  </div>
+
+  <div class="sidebar-section" style="margin-top:0.5rem;">
+    <div class="sidebar-heading">Project Info</div>
+    <div style="padding:0 1.25rem;font-size:12px;color:var(--text3);line-height:1.8;">
+      <div>วิชา AIC-103</div>
+      <div>Prince of Songkla Univ.</div>
+      <div style="margin-top:6px;">
+        <span class="badge badge-green">Java OOP</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+<!-- ════════════ OVERVIEW PAGE ════════════ -->
+<div id="page-overview" class="page active">
+
+  <div class="breadcrumb">
+    <span>PSU Shop</span><span class="sep">/</span><span style="color:var(--text);">Overview</span>
+  </div>
+
+  <div class="page-header">
+    <div class="page-title">PSU Shop System 🏪</div>
+    <div class="page-desc">ระบบร้านค้ามหาวิทยาลัย Prince of Songkla ที่สาธิตหลักการ OOP ครบทั้ง 4 Concept ด้วยภาษา Java</div>
+  </div>
+
+  <div class="alert alert-green">
+    <div class="alert-icon">✓</div>
+    <div>โปรเจกต์นี้ครอบคลุมหลักการ <strong>Encapsulation, Inheritance, Polymorphism</strong> และ <strong>Abstract Class</strong> — ผ่านครบทุก Test Case</div>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="grid4" style="margin-bottom:1.5rem;">
+    <div class="stat-card">
+      <div class="stat-label2">Java Files</div>
+      <div class="stat-val">5</div>
+      <div class="stat-sub">ไฟล์ทั้งหมด</div>
+      <div class="stat-bar"><div class="stat-fill" style="width:100%;background:var(--green);"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label2">OOP Concepts</div>
+      <div class="stat-val">4</div>
+      <div class="stat-sub">หลักการที่ใช้</div>
+      <div class="stat-bar"><div class="stat-fill" style="width:100%;background:#3b82f6;"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label2">Subclasses</div>
+      <div class="stat-val">2</div>
+      <div class="stat-sub">Uniform, Stationery</div>
+      <div class="stat-bar"><div class="stat-fill" style="width:66%;background:#8b5cf6;"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label2">Test Cases</div>
+      <div class="stat-val">5</div>
+      <div class="stat-sub">ทั้งหมดผ่าน</div>
+      <div class="stat-bar"><div class="stat-fill" style="width:100%;background:#f59e0b;"></div></div>
+    </div>
+  </div>
+
+  <!-- Project Structure -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">📁 Project Structure</div>
+      <span class="badge badge-gray">PSUShopSystem/</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ไฟล์</th><th>ประเภท</th><th>บทบาท</th><th>OOP Concept</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>Product.java</code></td>
+            <td><span class="badge badge-amber">Abstract Class</span></td>
+            <td>คลาสแม่กลาง — กำหนดโครงสร้างสินค้าทุกชนิด</td>
+            <td><span class="badge badge-amber">Abstract</span> <span class="badge badge-green">Encapsulation</span></td>
+          </tr>
+          <tr>
+            <td><code>Uniform.java</code></td>
+            <td><span class="badge badge-green">Subclass</span></td>
+            <td>ชุดนักศึกษา — สืบทอด Product เพิ่ม field size</td>
+            <td><span class="badge badge-blue">Inheritance</span> <span class="badge badge-purple">Polymorphism</span></td>
+          </tr>
+          <tr>
+            <td><code>Stationery.java</code></td>
+            <td><span class="badge badge-green">Subclass</span></td>
+            <td>เครื่องเขียน — สืบทอด Product เพิ่ม field type</td>
+            <td><span class="badge badge-blue">Inheritance</span> <span class="badge badge-purple">Polymorphism</span></td>
+          </tr>
+          <tr>
+            <td><code>StudentCustomer.java</code></td>
+            <td><span class="badge badge-blue">Class</span></td>
+            <td>ลูกค้านักศึกษา — ซื้อสินค้า, สะสมยอด, สรุปบิล</td>
+            <td><span class="badge badge-green">Encapsulation</span> <span class="badge badge-purple">Polymorphism</span></td>
+          </tr>
+          <tr>
+            <td><code>TestMain.java</code></td>
+            <td><span class="badge badge-gray">Main Class</span></td>
+            <td>Entry point — ทดสอบระบบด้วย 5 Test Cases</td>
+            <td>ใช้ทุก Concept รวมกัน</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Quick concept summary -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">⬡ OOP Concepts สรุปย่อ</div>
+    </div>
+    <div class="concept-list">
+      <div class="concept-item">
+        <div class="concept-num">01</div>
+        <div class="concept-content">
+          <div class="concept-name"><span class="badge badge-green">Encapsulation</span></div>
+          <div class="concept-desc">Field ทุกตัวประกาศเป็น <code>private</code> — ห้ามเข้าถึงจากภายนอกโดยตรง เข้าถึงได้ผ่าน getter/setter เท่านั้น <code>totalSpent</code> ไม่มี setter เลยเพื่อป้องกันการแก้ไข</div>
+        </div>
+      </div>
+      <div class="concept-item">
+        <div class="concept-num">02</div>
+        <div class="concept-content">
+          <div class="concept-name"><span class="badge badge-blue">Inheritance</span></div>
+          <div class="concept-desc"><code>Uniform</code> และ <code>Stationery</code> ใช้ <code>extends Product</code> → รับ field และเมธอดมาทั้งหมด เรียก <code>super()</code> ใน constructor เพื่อให้คลาสแม่จัดการค่าก่อน</div>
+        </div>
+      </div>
+      <div class="concept-item">
+        <div class="concept-num">03</div>
+        <div class="concept-content">
+          <div class="concept-name"><span class="badge badge-purple">Polymorphism</span></div>
+          <div class="concept-desc">ประกาศตัวแปรเป็น <code>Product</code> แต่ใส่ Object ชนิดลูกได้ เมื่อเรียก <code>displayProductInfo()</code> Java เลือก version ที่ถูกต้องเองตอน Runtime (Dynamic Dispatch)</div>
+        </div>
+      </div>
+      <div class="concept-item">
+        <div class="concept-num">04</div>
+        <div class="concept-content">
+          <div class="concept-name"><span class="badge badge-amber">Abstract Class</span></div>
+          <div class="concept-desc"><code>Product</code> เป็น <code>abstract class</code> → <code>new Product()</code> ตรงๆ ไม่ได้ มีเมธอด <code>abstract displayProductInfo()</code> ที่บังคับให้คลาสลูกทุกตัว Override</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /overview -->
+
+<!-- ════════════ CONCEPTS PAGE ════════════ -->
+<div id="page-concepts" class="page">
+
+  <div class="breadcrumb">
+    <span>PSU Shop</span><span class="sep">/</span><span style="color:var(--text);">OOP Concepts</span>
+  </div>
+  <div class="page-header">
+    <div class="page-title">OOP Concepts</div>
+    <div class="page-desc">อธิบายรายละเอียดหลักการ OOP แต่ละข้อที่ใช้ในโปรเจกต์นี้</div>
+  </div>
+
+  <!-- Encapsulation -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><span class="badge badge-green" style="font-size:12px;">01</span> Encapsulation — การห่อหุ้มข้อมูล</div>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-green" style="margin-bottom:1rem;">
+        <div class="alert-icon">💡</div>
+        <div><strong>หลักการ:</strong> ซ่อน field ภายในด้วย <code>private</code> และเปิดช่องทางเข้าถึงผ่าน <code>getter</code> (อ่าน) และ <code>setter</code> (เขียน) เท่านั้น</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Field</th><th>Access Modifier</th><th>Getter</th><th>Setter</th><th>หมายเหตุ</th></tr></thead>
+          <tbody>
+            <tr><td><code>Product.id</code></td><td><span class="badge badge-red">private</span></td><td><code>getId()</code></td><td><code>setId()</code></td><td></td></tr>
+            <tr><td><code>Product.name</code></td><td><span class="badge badge-red">private</span></td><td><code>getName()</code></td><td><code>setName()</code></td><td></td></tr>
+            <tr><td><code>Product.price</code></td><td><span class="badge badge-red">private</span></td><td><code>getPrice()</code></td><td><code>setPrice()</code></td><td></td></tr>
+            <tr><td><code>Uniform.size</code></td><td><span class="badge badge-red">private</span></td><td><code>getSize()</code></td><td><code>setSize()</code></td><td></td></tr>
+            <tr><td><code>Stationery.type</code></td><td><span class="badge badge-red">private</span></td><td><code>getType()</code></td><td><code>setType()</code></td><td></td></tr>
+            <tr><td><code>StudentCustomer.totalSpent</code></td><td><span class="badge badge-red">private</span></td><td><code>getTotalSpent()</code></td><td style="color:var(--text3);">— ไม่มี</td><td>ป้องกันการแก้จากภายนอก</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inheritance -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><span class="badge badge-blue" style="font-size:12px;">02</span> Inheritance — การสืบทอด</div>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-blue" style="margin-bottom:1rem;">
+        <div class="alert-icon">💡</div>
+        <div><strong>หลักการ:</strong> คลาสลูก <code>extends</code> คลาสแม่ → รับ field และเมธอดมาทั้งหมด ไม่ต้องเขียนซ้ำ ความสัมพันธ์แบบ <strong>IS-A</strong></div>
+      </div>
+      <div class="grid2">
+        <div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--navy);">สิ่งที่ Uniform ได้รับจาก Product</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>สืบทอดมา</th><th>เพิ่มเติมเอง</th></tr></thead>
+              <tbody>
+                <tr><td><code>id, name, price</code></td><td><code>size</code></td></tr>
+                <tr><td>getter/setter ทั้งหมด</td><td><code>getSize(), setSize()</code></td></tr>
+                <tr><td>constructor ผ่าน <code>super()</code></td><td>Override <code>displayProductInfo()</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--navy);">สิ่งที่ Stationery ได้รับจาก Product</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>สืบทอดมา</th><th>เพิ่มเติมเอง</th></tr></thead>
+              <tbody>
+                <tr><td><code>id, name, price</code></td><td><code>type</code></td></tr>
+                <tr><td>getter/setter ทั้งหมด</td><td><code>getType(), setType()</code></td></tr>
+                <tr><td>constructor ผ่าน <code>super()</code></td><td>Override <code>displayProductInfo()</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Polymorphism -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><span class="badge badge-purple" style="font-size:12px;">03</span> Polymorphism — ความหลากหลาย</div>
+    </div>
+    <div class="card-body">
+      <div class="alert" style="background:var(--purple-light);border-color:#c4b5fd;color:#3730a3;margin-bottom:1rem;">
+        <div class="alert-icon">💡</div>
+        <div><strong>หลักการ:</strong> Object ชนิดลูกสามารถถูกเก็บในตัวแปรชนิดแม่ได้ และ Java เลือกเรียกเมธอดที่ถูกต้องเองตอน Runtime</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>บรรทัดใน TestMain</th><th>ประเภทตัวแปร</th><th>Object จริง</th><th>เรียก displayProductInfo() → ผล</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code>Product shirt = new Uniform(...)</code></td>
+              <td><span class="badge badge-amber">Product</span></td>
+              <td><span class="badge badge-green">Uniform</span></td>
+              <td>เรียก Uniform version → <code>[Uniform] CoC Polo Shirt...</code></td>
+            </tr>
+            <tr>
+              <td><code>Product pen = new Stationery(...)</code></td>
+              <td><span class="badge badge-amber">Product</span></td>
+              <td><span class="badge badge-green">Stationery</span></td>
+              <td>เรียก Stationery version → <code>[Stationery] PSU Blue Pen...</code></td>
+            </tr>
+            <tr>
+              <td><code>student.buyProduct(shirt)</code></td>
+              <td colspan="2">parameter รับ <code>Product</code> → ใส่ Uniform ได้</td>
+              <td>Dynamic Dispatch ทำงาน</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Abstract -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><span class="badge badge-amber" style="font-size:12px;">04</span> Abstract Class — คลาสนามธรรม</div>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-amber" style="margin-bottom:1rem;">
+        <div class="alert-icon">💡</div>
+        <div><strong>หลักการ:</strong> Abstract Class คือ "แม่แบบ" ที่ไม่สามารถสร้าง Object ตรงๆ ได้ ใช้กำหนด structure ให้คลาสลูกทุกตัวต้องปฏิบัติตาม</div>
+      </div>
+      <div class="grid2">
+        <div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;">ทำได้ ✓</div>
+          <div class="table-wrap">
+            <table>
+              <tbody>
+                <tr><td><code>Product p = new Uniform(...);</code></td></tr>
+                <tr><td><code>Product p = new Stationery(...);</code></td></tr>
+                <tr><td>extends Product แล้ว Override</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--red);">ทำไม่ได้ ✗</div>
+          <div class="table-wrap">
+            <table>
+              <tbody>
+                <tr><td style="color:var(--red);"><code>new Product(...)</code> → Compile Error!</td></tr>
+                <tr><td style="color:var(--red);">extends แล้วไม่ Override → Error!</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /concepts -->
+
+<!-- ════════════ CODE PAGE ════════════ -->
+<div id="page-code" class="page">
+
+  <div class="breadcrumb">
+    <span>PSU Shop</span><span class="sep">/</span><span style="color:var(--text);">Source Code</span>
+  </div>
+  <div class="page-header">
+    <div class="page-title">Source Code</div>
+    <div class="page-desc">โค้ด Java ทั้ง 5 ไฟล์พร้อม comment อธิบายทุกบรรทัดสำคัญ</div>
+  </div>
+
+  <div class="code-viewer">
+    <div class="code-tabs">
+      <div class="code-tab active" id="ctab-product" onclick="switchCode('product')">Product.java</div>
+      <div class="code-tab" id="ctab-uniform" onclick="switchCode('uniform')">Uniform.java</div>
+      <div class="code-tab" id="ctab-stationery" onclick="switchCode('stationery')">Stationery.java</div>
+      <div class="code-tab" id="ctab-student" onclick="switchCode('student')">StudentCustomer.java</div>
+      <div class="code-tab" id="ctab-main" onclick="switchCode('main')">TestMain.java</div>
+    </div>
+    <div class="code-panels">
+
+      <!-- Product -->
+      <div class="code-panel active" id="cpanel-product">
+        <div class="code-meta">
+          <span>Product.java <span class="badge badge-amber" style="font-size:10px;">abstract class</span></span>
+          <button class="copy-btn" onclick="copyCode('product')">copy</button>
+        </div>
+        <pre id="code-product"><span class="cmt">// ============================================================
+// Product.java — Base Class (คลาสแม่)
+// บทบาท: Abstract Class กลางที่สินค้าทุกชนิดต้องสืบทอด
+// OOP: Encapsulation, Abstract Class
+// ============================================================</span>
+
+<span class="kw">public abstract class</span> <span class="cls">Product</span> {   <span class="cmt">// abstract = สร้าง new Product() ตรงๆ ไม่ได้</span>
+
+    <span class="cmt">// ── Encapsulation: ประกาศ private ซ่อนข้อมูลจากภายนอก ──────</span>
+    <span class="kw">private</span> <span class="cls">String</span> id;       <span class="cmt">// รหัสสินค้า</span>
+    <span class="kw">private</span> <span class="cls">String</span> name;     <span class="cmt">// ชื่อสินค้า</span>
+    <span class="kw">private</span> <span class="kw">double</span> price;    <span class="cmt">// ราคาสินค้า</span>
+
+    <span class="cmt">// Constructor: คลาสลูกจะเรียกผ่าน super(id, name, price)</span>
+    <span class="kw">public</span> <span class="cls">Product</span>(<span class="cls">String</span> id, <span class="cls">String</span> name, <span class="kw">double</span> price) {
+        <span class="kw">this</span>.id    = id;
+        <span class="kw">this</span>.name  = name;
+        <span class="kw">this</span>.price = price;
+    }
+
+    <span class="cmt">// ── Getter/Setter: ช่องทางเข้าถึง field private ────────────
+    // Getter = อ่านค่า | Setter = เขียนค่า (ควบคุมได้)</span>
+    <span class="kw">public</span> <span class="cls">String</span> <span class="fn">getId</span>()              { <span class="kw">return</span> id; }
+    <span class="kw">public void</span> <span class="fn">setId</span>(<span class="cls">String</span> id)       { <span class="kw">this</span>.id = id; }
+
+    <span class="kw">public</span> <span class="cls">String</span> <span class="fn">getName</span>()            { <span class="kw">return</span> name; }
+    <span class="kw">public void</span> <span class="fn">setName</span>(<span class="cls">String</span> name)   { <span class="kw">this</span>.name = name; }
+
+    <span class="kw">public double</span> <span class="fn">getPrice</span>()           { <span class="kw">return</span> price; }
+    <span class="kw">public void</span> <span class="fn">setPrice</span>(<span class="kw">double</span> price) { <span class="kw">this</span>.price = price; }
+
+    <span class="cmt">// ── Abstract Method: บังคับให้คลาสลูกทุกตัว Override ────────
+    // ไม่มี body {} = คลาสลูกต้องเขียนเองทั้งหมด
+    // นี่คือหัวใจของ Polymorphism</span>
+    <span class="kw">public abstract void</span> <span class="fn">displayProductInfo</span>();   <span class="cmt">// ← abstract method</span>
+}</pre>
+      </div>
+
+      <!-- Uniform -->
+      <div class="code-panel" id="cpanel-uniform">
+        <div class="code-meta">
+          <span>Uniform.java <span class="badge badge-green" style="font-size:10px;">extends Product</span></span>
+          <button class="copy-btn" onclick="copyCode('uniform')">copy</button>
+        </div>
+        <pre id="code-uniform"><span class="cmt">// ============================================================
+// Uniform.java — Subclass ของ Product (ชุดนักศึกษา)
+// OOP: Inheritance, Encapsulation, Polymorphism (Override)
+// ============================================================</span>
+
+<span class="cmt">// "extends Product" = Inheritance: Uniform IS-A Product</span>
+<span class="kw">public class</span> <span class="cls">Uniform</span> <span class="kw">extends</span> <span class="cls">Product</span> {
+
+    <span class="cmt">// field เพิ่มเติมเฉพาะของ Uniform (ที่ Product ไม่มี)</span>
+    <span class="kw">private</span> <span class="cls">String</span> size;   <span class="cmt">// Encapsulation: private</span>
+
+    <span class="cmt">// Constructor:
+    // 1. เรียก super() ให้ Product จัดการ id, name, price ก่อน
+    // 2. จากนั้นค่อยกำหนด size ของ Uniform เอง</span>
+    <span class="kw">public</span> <span class="cls">Uniform</span>(<span class="cls">String</span> id, <span class="cls">String</span> name, <span class="kw">double</span> price, <span class="cls">String</span> size) {
+        <span class="kw">super</span>(id, name, price);   <span class="cmt">// Inheritance: ส่งให้ constructor ของ Product</span>
+        <span class="kw">this</span>.size = size;
+    }
+
+    <span class="cmt">// Getter/Setter สำหรับ size</span>
+    <span class="kw">public</span> <span class="cls">String</span> <span class="fn">getSize</span>()             { <span class="kw">return</span> size; }
+    <span class="kw">public void</span> <span class="fn">setSize</span>(<span class="cls">String</span> size)   { <span class="kw">this</span>.size = size; }
+
+    <span class="cmt">// ── Polymorphism: Override เมธอด abstract จาก Product ──────
+    // @Override แสดงว่านี่คือการ Override (compiler จะตรวจให้)
+    // เนื้อหาแสดงผลในรูปแบบของ Uniform โดยเฉพาะ</span>
+    <span class="ann">@Override</span>
+    <span class="kw">public void</span> <span class="fn">displayProductInfo</span>() {   <span class="cmt">// Polymorphism</span>
+        <span class="cls">System</span>.out.println(
+            <span class="str">"[Uniform] "</span> + <span class="fn">getName</span>() +
+            <span class="str">" (Size: "</span> + size + <span class="str">") | Price: "</span> + <span class="fn">getPrice</span>() + <span class="str">" THB"</span>
+        );
+    }
+}</pre>
+      </div>
+
+      <!-- Stationery -->
+      <div class="code-panel" id="cpanel-stationery">
+        <div class="code-meta">
+          <span>Stationery.java <span class="badge badge-green" style="font-size:10px;">extends Product</span></span>
+          <button class="copy-btn" onclick="copyCode('stationery')">copy</button>
+        </div>
+        <pre id="code-stationery"><span class="cmt">// ============================================================
+// Stationery.java — Subclass ของ Product (เครื่องเขียน)
+// OOP: Inheritance, Encapsulation, Polymorphism (Override)
+// ============================================================</span>
+
+<span class="kw">public class</span> <span class="cls">Stationery</span> <span class="kw">extends</span> <span class="cls">Product</span> {   <span class="cmt">// Inheritance</span>
+
+    <span class="cmt">// field เพิ่มเติมเฉพาะของ Stationery (ประเภทเครื่องเขียน)</span>
+    <span class="kw">private</span> <span class="cls">String</span> type;   <span class="cmt">// Encapsulation: private</span>
+
+    <span class="cmt">// Constructor: ส่ง id, name, price ให้ Product ผ่าน super()</span>
+    <span class="kw">public</span> <span class="cls">Stationery</span>(<span class="cls">String</span> id, <span class="cls">String</span> name, <span class="kw">double</span> price, <span class="cls">String</span> type) {
+        <span class="kw">super</span>(id, name, price);   <span class="cmt">// Inheritance: เรียก constructor แม่</span>
+        <span class="kw">this</span>.type = type;
+    }
+
+    <span class="cmt">// Getter/Setter สำหรับ type</span>
+    <span class="kw">public</span> <span class="cls">String</span> <span class="fn">getType</span>()             { <span class="kw">return</span> type; }
+    <span class="kw">public void</span> <span class="fn">setType</span>(<span class="cls">String</span> type)   { <span class="kw">this</span>.type = type; }
+
+    <span class="cmt">// ── Polymorphism: Override เมธอด abstract จาก Product ──────
+    // เหมือน Uniform แต่รูปแบบข้อความต่างกัน
+    // → ตัวอย่างชัดเจนว่า "เมธอดเดียวกัน ทำงานต่างกัน"</span>
+    <span class="ann">@Override</span>
+    <span class="kw">public void</span> <span class="fn">displayProductInfo</span>() {   <span class="cmt">// Polymorphism</span>
+        <span class="cls">System</span>.out.println(
+            <span class="str">"[Stationery] "</span> + <span class="fn">getName</span>() +
+            <span class="str">" (Type: "</span> + type + <span class="str">") | Price: "</span> + <span class="fn">getPrice</span>() + <span class="str">" THB"</span>
+        );
+    }
+}</pre>
+      </div>
+
+      <!-- StudentCustomer -->
+      <div class="code-panel" id="cpanel-student">
+        <div class="code-meta">
+          <span>StudentCustomer.java <span class="badge badge-blue" style="font-size:10px;">class</span></span>
+          <button class="copy-btn" onclick="copyCode('student')">copy</button>
+        </div>
+        <pre id="code-student"><span class="cmt">// ============================================================
+// StudentCustomer.java — คลาสลูกค้านักศึกษา
+// OOP: Encapsulation (totalSpent), Polymorphism (buyProduct)
+// ============================================================</span>
+
+<span class="kw">public class</span> <span class="cls">StudentCustomer</span> {
+
+    <span class="cmt">// ── Encapsulation: ทุก field เป็น private ──────────────────</span>
+    <span class="kw">private</span> <span class="cls">String</span> studentId;
+    <span class="kw">private</span> <span class="cls">String</span> name;
+    <span class="kw">private</span> <span class="kw">double</span> totalSpent;   <span class="cmt">// สำคัญ! ไม่มี setter → ภายนอกแก้ไม่ได้</span>
+
+    <span class="cmt">// Constructor: กำหนดค่าเริ่มต้น totalSpent = 0.0 ทันที</span>
+    <span class="kw">public</span> <span class="cls">StudentCustomer</span>(<span class="cls">String</span> studentId, <span class="cls">String</span> name) {
+        <span class="kw">this</span>.studentId  = studentId;
+        <span class="kw">this</span>.name       = name;
+        <span class="kw">this</span>.totalSpent = <span class="num">0.0</span>;   <span class="cmt">// เริ่มที่ 0 เสมอ</span>
+    }
+
+    <span class="cmt">// Getter เท่านั้น (studentId, name ไม่ควรเปลี่ยน)</span>
+    <span class="kw">public</span> <span class="cls">String</span> <span class="fn">getStudentId</span>()  { <span class="kw">return</span> studentId; }
+    <span class="kw">public</span> <span class="cls">String</span> <span class="fn">getName</span>()        { <span class="kw">return</span> name; }
+    <span class="kw">public double</span> <span class="fn">getTotalSpent</span>()  { <span class="kw">return</span> totalSpent; }   <span class="cmt">// อ่านได้อย่างเดียว</span>
+
+    <span class="cmt">// ── buyProduct: รับ Product (ประเภทแม่) ─────────────────────
+    // → ใส่ Uniform หรือ Stationery ก็ได้ (Polymorphism)
+    // → Java เลือก displayProductInfo() ที่ถูกต้องเองตอน Runtime</span>
+    <span class="kw">public void</span> <span class="fn">buyProduct</span>(<span class="cls">Product</span> product) {   <span class="cmt">// parameter เป็นชนิด Product (แม่)</span>
+        <span class="cls">System</span>.out.println(
+            <span class="str">">>> Student "</span> + <span class="kw">this</span>.name +
+            <span class="str">" ("</span> + <span class="kw">this</span>.studentId + <span class="str">") is buying:"</span>
+        );
+
+        <span class="cmt">// Polymorphism: Java เลือกเรียก version ที่ถูกต้องเองตอน Runtime</span>
+        product.<span class="fn">displayProductInfo</span>();
+
+        <span class="cmt">// สะสมยอดรวม — แก้ได้แค่จากภายในคลาสนี้ (Encapsulation)</span>
+        <span class="kw">this</span>.totalSpent += product.<span class="fn">getPrice</span>();
+
+        <span class="cls">System</span>.out.println(<span class="str">"-------------------------------------------------"</span>);
+    }
+
+    <span class="cmt">// แสดงสรุปใบเสร็จ</span>
+    <span class="kw">public void</span> <span class="fn">displayTotalSummary</span>() {
+        <span class="cls">System</span>.out.println(<span class="str">"=== Receipt Summary ==="</span>);
+        <span class="cls">System</span>.out.println(<span class="str">"Customer: "</span>         + <span class="kw">this</span>.name);
+        <span class="cls">System</span>.out.println(<span class="str">"Total Amount Due: "</span> + <span class="kw">this</span>.totalSpent + <span class="str">" THB"</span>);
+        <span class="cls">System</span>.out.println(<span class="str">"======================="</span>);
+    }
+}</pre>
+      </div>
+
+      <!-- TestMain -->
+      <div class="code-panel" id="cpanel-main">
+        <div class="code-meta">
+          <span>TestMain.java <span class="badge badge-red" style="font-size:10px;">main class</span></span>
+          <button class="copy-btn" onclick="copyCode('main')">copy</button>
+        </div>
+        <pre id="code-main"><span class="cmt">// ============================================================
+// TestMain.java — Entry Point (จุดเริ่มต้นโปรแกรม)
+// บทบาท: ทดสอบทุก OOP Concept ด้วย 5 Test Cases
+// ============================================================</span>
+
+<span class="kw">public class</span> <span class="cls">TestMain</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="cls">String</span>[] args) {
+        <span class="cls">System</span>.out.println(<span class="str">"========== PSU Shop System ==========\n"</span>);
+
+        <span class="cmt">// ── สร้างสินค้า ────────────────────────────────────────────
+        // ตัวแปรประกาศเป็น Product (แม่) แต่ Object จริงเป็นลูก
+        // → "Uniform IS-A Product" ทำให้ทำแบบนี้ได้ (Polymorphism + Inheritance)</span>
+        <span class="cls">Product</span> shirt = <span class="kw">new</span> <span class="cls">Uniform</span>(<span class="str">"U001"</span>, <span class="str">"CoC Polo Shirt"</span>, <span class="num">350.0</span>, <span class="str">"XL"</span>);
+        <span class="cls">Product</span> pen   = <span class="kw">new</span> <span class="cls">Stationery</span>(<span class="str">"S001"</span>, <span class="str">"PSU Blue Pen"</span>, <span class="num">15.25</span>, <span class="str">"Ballpoint"</span>);
+        <span class="cls">Product</span> paper = <span class="kw">new</span> <span class="cls">Stationery</span>(<span class="str">"S002"</span>, <span class="str">"PSU Paper"</span>, <span class="num">45.0</span>, <span class="str">"A4"</span>);
+
+        <span class="cmt">// สร้างนักศึกษา (totalSpent เริ่มที่ 0 อัตโนมัติ)</span>
+        <span class="cls">StudentCustomer</span> student = <span class="kw">new</span> <span class="cls">StudentCustomer</span>(<span class="str">"6830614123"</span>, <span class="str">"SomChai"</span>);
+
+        <span class="cmt">// ── Test Case 1: แสดงสินค้าทั้งหมด ─────────────────────────
+        // เรียก displayProductInfo() บน Product reference
+        // Java รู้เองว่าต้องเรียก version ใด (Polymorphism)</span>
+        <span class="cls">System</span>.out.println(<span class="str">"--- Test Case 1: Product Catalog ---"</span>);
+        shirt.displayProductInfo();   <span class="cmt">// → เรียก Uniform version</span>
+        pen.displayProductInfo();     <span class="cmt">// → เรียก Stationery version</span>
+        paper.displayProductInfo();   <span class="cmt">// → เรียก Stationery version</span>
+
+        <span class="cmt">// ── Test Case 2–4: ซื้อสินค้า ────────────────────────────────
+        // buyProduct() รับ Product → ใส่ลูกได้ทุกชนิด (Polymorphism)
+        // totalSpent สะสมอัตโนมัติ (Encapsulation)</span>
+        <span class="cls">System</span>.out.println(<span class="str">"\n--- Test Case 2: Buy Uniform ---"</span>);
+        student.buyProduct(shirt);
+
+        <span class="cls">System</span>.out.println(<span class="str">"--- Test Case 3: Buy Pen ---"</span>);
+        student.buyProduct(pen);
+
+        <span class="cls">System</span>.out.println(<span class="str">"--- Test Case 4: Buy Notebook ---"</span>);
+        student.buyProduct(paper);
+
+        <span class="cmt">// ── Test Case 5: สรุปยอด ────────────────────────────────────
+        // ยอด 350 + 15.25 + 45 = 410.25 THB
+        // เข้าถึง totalSpent ได้แค่ผ่าน getTotalSpent() (Encapsulation)</span>
+        <span class="cls">System</span>.out.println(<span class="str">"--- Test Case 5: Total Summary ---"</span>);
+        student.displayTotalSummary();
+    }
+}</pre>
+      </div>
+
+    </div>
+  </div>
+</div><!-- /code -->
+
+<!-- ════════════ DIAGRAM PAGE ════════════ -->
+<div id="page-diagram" class="page">
+  <div class="breadcrumb">
+    <span>PSU Shop</span><span class="sep">/</span><span style="color:var(--text);">Class Diagram</span>
+  </div>
+  <div class="page-header">
+    <div class="page-title">UML Class Diagram</div>
+    <div class="page-desc">แสดงความสัมพันธ์ระหว่าง Class ทั้งหมดในโปรเจกต์</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">📊 Class Hierarchy</div>
+      <div style="display:flex;gap:8px;">
+        <span class="badge badge-amber">«abstract»</span>
+        <span class="badge badge-green">extends</span>
+        <span class="badge badge-blue">uses</span>
+      </div>
+    </div>
+    <div class="card-body" style="padding:1rem;">
+      <div class="uml-wrap">
+
+        <!-- Product -->
+        <div class="uml-box" style="min-width:280px;">
+          <div class="uml-head abstract">
+            <span class="uml-stereotype">«abstract class»</span>
+            Product
+          </div>
+          <div class="uml-section">
+            <div class="uml-field"><span class="vis">-</span> id : String</div>
+            <div class="uml-field"><span class="vis">-</span> name : String</div>
+            <div class="uml-field"><span class="vis">-</span> price : double</div>
+          </div>
+          <div class="uml-section">
+            <div class="uml-method">+ getId() : String</div>
+            <div class="uml-method">+ getName() : String</div>
+            <div class="uml-method">+ getPrice() : double</div>
+            <div class="uml-method">+ setId / setName / setPrice()</div>
+            <div class="uml-method abstract-m">+ displayProductInfo() * abstract</div>
+          </div>
+        </div>
+
+        <!-- arrow down -->
+        <div class="arrow-area">
+          <div class="arr-label">extends (Inheritance)</div>
+          <div class="arr-line"></div>
+          <div style="font-size:14px;color:var(--border2);">▼</div>
+        </div>
+
+        <!-- Row: Uniform + Stationery -->
+        <div class="uml-row">
+          <div class="uml-box">
+            <div class="uml-head concrete">Uniform</div>
+            <div class="uml-section">
+              <div class="uml-field"><span class="vis">-</span> size : String</div>
+            </div>
+            <div class="uml-section">
+              <div class="uml-method">+ getSize() : String</div>
+              <div class="uml-method">+ setSize(String)</div>
+              <div class="uml-method override-m">@Override displayProductInfo()</div>
+            </div>
+          </div>
+          <div class="uml-box">
+            <div class="uml-head concrete">Stationery</div>
+            <div class="uml-section">
+              <div class="uml-field"><span class="vis">-</span> type : String</div>
+            </div>
+            <div class="uml-section">
+              <div class="uml-method">+ getType() : String</div>
+              <div class="uml-method">+ setType(String)</div>
+              <div class="uml-method override-m">@Override displayProductInfo()</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- uses arrow -->
+        <div class="arrow-area" style="margin-top:1rem;">
+          <div class="arr-label" style="color:var(--blue);">uses (dependency)</div>
+          <div class="arr-line"></div>
+          <div style="font-size:14px;color:var(--border2);">▼</div>
+        </div>
+
+        <!-- StudentCustomer -->
+        <div class="uml-box" style="min-width:280px;">
+          <div class="uml-head other">StudentCustomer</div>
+          <div class="uml-section">
+            <div class="uml-field"><span class="vis">-</span> studentId : String</div>
+            <div class="uml-field"><span class="vis">-</span> name : String</div>
+            <div class="uml-field"><span class="vis">-</span> totalSpent : double</div>
+          </div>
+          <div class="uml-section">
+            <div class="uml-method">+ getStudentId() : String</div>
+            <div class="uml-method">+ getName() : String</div>
+            <div class="uml-method">+ getTotalSpent() : double</div>
+            <div class="uml-method" style="color:var(--purple);">+ buyProduct(Product) : void</div>
+            <div class="uml-method">+ displayTotalSummary() : void</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Relationships Table -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">🔗 ความสัมพันธ์ระหว่าง Class</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ความสัมพันธ์</th><th>คลาส</th><th>ประเภท</th><th>OOP Concept</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Uniform → Product</td>
+            <td><code>extends Product</code></td>
+            <td><span class="badge badge-green">IS-A</span></td>
+            <td>Inheritance</td>
+          </tr>
+          <tr>
+            <td>Stationery → Product</td>
+            <td><code>extends Product</code></td>
+            <td><span class="badge badge-green">IS-A</span></td>
+            <td>Inheritance</td>
+          </tr>
+          <tr>
+            <td>StudentCustomer → Product</td>
+            <td><code>buyProduct(Product p)</code></td>
+            <td><span class="badge badge-blue">Uses</span></td>
+            <td>Polymorphism</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div><!-- /diagram -->
+
+<!-- ════════════ OUTPUT PAGE ════════════ -->
+<div id="page-output" class="page">
+  <div class="breadcrumb">
+    <span>PSU Shop</span><span class="sep">/</span><span style="color:var(--text);">Program Output</span>
+  </div>
+  <div class="page-header">
+    <div class="page-title">Program Output</div>
+    <div class="page-desc">ผลลัพธ์ที่ได้เมื่อรัน TestMain.java ครบทั้ง 5 Test Cases</div>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="t-dot" style="background:#ff5f57;"></div>
+      <div class="t-dot" style="background:#febc2e;"></div>
+      <div class="t-dot" style="background:#28c840;"></div>
+      <div class="t-title">Terminal — javac *.java && java TestMain</div>
+    </div>
+    <div class="terminal-body">
+<span>========== PSU Shop System ==========</span>
+
+<span class="t-cmt">--- Test Case 1: Product Catalog ---</span>
+<span class="t-uni">[Uniform] CoC Polo Shirt (Size: XL) | Price: 350.0 THB</span>
+<span class="t-sta">[Stationery] PSU Blue Pen (Type: Ballpoint) | Price: 15.25 THB</span>
+<span class="t-sta">[Stationery] PSU Paper (Type: A4) | Price: 45.0 THB</span>
+
+<span class="t-cmt">--- Test Case 2: Buy Uniform ---</span>
+<span class="t-arrow">>>> Student SomChai (6830614123) is buying:</span>
+<span class="t-uni">[Uniform] CoC Polo Shirt (Size: XL) | Price: 350.0 THB</span>
+-------------------------------------------------
+
+<span class="t-cmt">--- Test Case 3: Buy Pen ---</span>
+<span class="t-arrow">>>> Student SomChai (6830614123) is buying:</span>
+<span class="t-sta">[Stationery] PSU Blue Pen (Type: Ballpoint) | Price: 15.25 THB</span>
+-------------------------------------------------
+
+<span class="t-cmt">--- Test Case 4: Buy Notebook ---</span>
+<span class="t-arrow">>>> Student SomChai (6830614123) is buying:</span>
+<span class="t-sta">[Stationery] PSU Paper (Type: A4) | Price: 45.0 THB</span>
+-------------------------------------------------
+
+<span class="t-cmt">--- Test Case 5: Total Summary ---</span>
+<span class="t-sum">=== Receipt Summary ===</span>
+<span class="t-sum">Customer: SomChai</span>
+<span class="t-sum">Total Amount Due: 410.25 THB</span>
+<span class="t-sum">=======================</span>
+    </div>
+  </div>
+
+  <div style="margin-top:1.5rem;">
+    <div class="card">
+      <div class="card-header"><div class="card-title">🧮 การคำนวณ totalSpent</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Test Case</th><th>สินค้า</th><th>ราคา</th><th>ยอดสะสม</th></tr></thead>
+          <tbody>
+            <tr><td>เริ่มต้น</td><td>—</td><td>—</td><td>0.00 THB</td></tr>
+            <tr><td>Test Case 2</td><td>CoC Polo Shirt</td><td>350.00</td><td>350.00 THB</td></tr>
+            <tr><td>Test Case 3</td><td>PSU Blue Pen</td><td>15.25</td><td>365.25 THB</td></tr>
+            <tr><td>Test Case 4</td><td>PSU Paper</td><td>45.00</td><td><strong>410.25 THB ✓</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /output -->
+
+<div class="footer-bar">
+  <span>PSU Shop System — AIC-103 OOP Java Project</span>
+  <span>Prince of Songkla University</span>
+</div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+function showPage(id, tabEl, sideEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (tabEl) {
+    document.querySelectorAll('.topbar-tab').forEach(t => t.classList.remove('active'));
+    tabEl.classList.add('active');
+  }
+  if (sideEl) {
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    sideEl.classList.add('active');
+  }
+}
+
+function switchCode(name) {
+  document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.code-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('ctab-' + name).classList.add('active');
+  document.getElementById('cpanel-' + name).classList.add('active');
+}
+
+function copyCode(name) {
+  const el = document.getElementById('code-' + name);
+  const text = el.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = el.closest('.code-panel').querySelector('.copy-btn');
+    btn.textContent = 'copied!';
+    btn.style.background = 'var(--green)';
+    btn.style.color = '#fff';
+    setTimeout(() => { btn.textContent = 'copy'; btn.style.background=''; btn.style.color=''; }, 1500);
+  });
+}
+</script>
+</body>
+</html>
